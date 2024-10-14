@@ -1,4 +1,3 @@
-
 # Using the Miniconda base image
 FROM continuumio/miniconda3:24.1.2-0
 
@@ -13,7 +12,7 @@ LABEL org.opencontainers.image.source=https://github.com/getwilds/wilds-docker-l
 LABEL org.opencontainers.image.licenses=MIT
 
 # Switching from hard-links to copies and installing GATK
-RUN conda config --set always_copy true && conda install -y -c bioconda gatk4=4.3.0.0
+# RUN conda config --set always_copy true && conda install -y -c bioconda gatk4=4.3.0.0
 
 # Installing Samtools prerequisites
 RUN apt-get update \
@@ -33,3 +32,16 @@ WORKDIR /
 
 # Cleanup
 RUN rm -rf samtools-1.11 samtools-1.11.tar.bz2
+
+
+# Switching from hard-links to copies
+RUN conda config --set always_copy true
+
+# Remove defaults channel, add conda-forge and bioconda
+RUN conda config --add channels conda-forge
+RUN conda config --add channels bioconda
+RUN conda config --remove channels defaults
+RUN conda config --set channel_priority strict
+
+# Installing GATK via conda
+RUN conda install -y --override-channels --channel conda-forge --channel bioconda gatk4=4.3.0.0
